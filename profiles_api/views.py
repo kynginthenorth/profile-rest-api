@@ -2,12 +2,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
 
 from profiles_api import serializers
+from profiles_api import models
+from profiles_api import permissions
 
 class HelloApiView(APIView):
     """Test API View"""
-    serializers_class = serializers.HelloSerializer
+    serializer_class = serializers.HelloSerializer
 
     def get(self, request, format=None):
         """Returns a list of APIView features"""
@@ -22,7 +25,7 @@ class HelloApiView(APIView):
 
     def post(self, request):
         """Create a hello message with our name"""
-        serializer = self.serializers_class(data=request.data)
+        serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
             name = serializer.validated_data.get('name')
@@ -54,7 +57,7 @@ class HelloApiView(APIView):
 
 class HelloViewSet(viewsets.ViewSet):
     """Test API ViewSet"""
-    serializers_class = serializers.HelloSerializer
+    serializer_class = serializers.HelloSerializer
 
     def list(self,request):
         """Return a hello message"""
@@ -71,7 +74,7 @@ class HelloViewSet(viewsets.ViewSet):
     
     def create(self, request):
         """Create a new hello message"""
-        serializer = self.serializers_class(data=request.data)
+        serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
             name = serializer.validated_data.get('name')
@@ -108,3 +111,10 @@ class HelloViewSet(viewsets.ViewSet):
         return Response({
             'http_method':'DELETE'
         })
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """Handle creating and updating profiles"""
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfiles.objects.all()
+    authentication_classes =(TokenAuthentication,)
+    permission_classes = (permissions.UpdateOwnProfile,)
