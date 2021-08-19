@@ -1,3 +1,4 @@
 # Profiles REST API
 
-Profiles REST API course code.
+A simple REST API
+
